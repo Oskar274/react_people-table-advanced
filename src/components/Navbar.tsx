@@ -1,4 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useState } from 'react';
+import classNames from 'classnames';
+
 export const Navbar = () => {
+  const [active, setActive] = useState(false);
+
   return (
     <nav
       data-cy="nav"
