@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getPeople } from '../api';
 import { Person } from '../types';
 import { Loader } from './Loader';
+import { useSearchParams } from 'react-router-dom';
 
 type Props = {
   name?: string;
@@ -13,6 +14,17 @@ type Props = {
 export const PeopleTableFix = (props: Props) => {
   const [people, setPeople] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const sort = searchParams.get('sort') ?? '';
+  const order = searchParams.get('order') ?? 'asc';
+
+  const getSortIcon = (field: string) => {
+    if (sort !== field) {
+      return 'fa-sort';
+    }
+
+    return order === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
+  };
 
   useEffect(() => {
     getPeople()
@@ -25,6 +37,8 @@ export const PeopleTableFix = (props: Props) => {
     query: string,
     sex = '',
     centuries: number[] = [],
+    sortField = '',
+    sortOrder = '',
   ) {
     let result = peoplelist;
 
@@ -47,8 +61,43 @@ export const PeopleTableFix = (props: Props) => {
       );
     }
 
+    if (sortField) {
+      result = [...result].sort((a, b) => {
+        const dir = sortOrder === 'asc' ? 1 : -1;
+
+        switch (sortField) {
+          case 'name':
+          case 'sex':
+            return a[sortField].localeCompare(b[sortField]) * dir;
+          case 'born':
+          case 'died':
+            return (a[sortField] - b[sortField]) * dir;
+          default:
+            return 0;
+        }
+      });
+    }
+
     return result;
   }
+
+  const handleSort = (field: string) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (sort === field) {
+      if (order === 'asc') {
+        params.set('order', 'desc');
+      } else {
+        params.delete('sort');
+        params.delete('order');
+      }
+    } else {
+      params.set('sort', field);
+      params.set('order', 'asc');
+    }
+
+    setSearchParams(params);
+  };
 
   return (
     <table
@@ -57,44 +106,44 @@ export const PeopleTableFix = (props: Props) => {
     >
       <thead>
         <tr>
-          <th>
+          <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
             <span className="is-flex is-flex-wrap-nowrap">
               Name
-              <a href="#/people?sort=name">
+              <span>
                 <span className="icon">
-                  <i className="fas fa-sort" />
+                  <i className={`fas ${getSortIcon('name')}`} />
                 </span>
-              </a>
+              </span>
             </span>
           </th>
-          <th>
+          <th onClick={() => handleSort('sex')} style={{ cursor: 'pointer' }}>
             <span className="is-flex is-flex-wrap-nowrap">
               Sex
-              <a href="#/people?sort=sex">
+              <span>
                 <span className="icon">
-                  <i className="fas fa-sort" />
+                  <i className={`fas ${getSortIcon('sex')}`} />
                 </span>
-              </a>
+              </span>
             </span>
           </th>
-          <th>
+          <th onClick={() => handleSort('born')} style={{ cursor: 'pointer' }}>
             <span className="is-flex is-flex-wrap-nowrap">
               Born
-              <a href="#/people?sort=born&amp;order=desc">
+              <span>
                 <span className="icon">
-                  <i className="fas fa-sort-up" />
+                  <i className={`fas ${getSortIcon('born')}`} />
                 </span>
-              </a>
+              </span>
             </span>
           </th>
-          <th>
+          <th onClick={() => handleSort('died')} style={{ cursor: 'pointer' }}>
             <span className="is-flex is-flex-wrap-nowrap">
               Died
-              <a href="#/people?sort=died">
+              <span>
                 <span className="icon">
-                  <i className="fas fa-sort" />
+                  <i className={`fas ${getSortIcon('died')}`} />
                 </span>
-              </a>
+              </span>
             </span>
           </th>
           <th>Mother</th>
@@ -111,6 +160,8 @@ export const PeopleTableFix = (props: Props) => {
             props.name ?? '',
             props.sex ?? '',
             props.century ?? [],
+            sort,
+            order,
           ).map(person => (
             <tr data-cy="person" key={person.slug}>
               <td>

@@ -2,50 +2,63 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import classNames from 'classnames';
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-type PeopleFilterProps = {
-  sendFilters: (newFilters: {
-    name?: string;
-    sex?: string;
-    centuries?: number[];
-  }) => void;
-};
-
-export const PeopleFilters = (props: PeopleFilterProps) => {
-  const [sex, setSex] = useState('');
-  const [name, setName] = useState('');
-  const [centuries, setCenturies] = useState<number[]>([]);
-
-  const handleResetFilters = () => {
-    setSex('');
-    setName('');
-    setCenturies([]);
-    props.sendFilters({ name: '', sex: '', centuries: [] });
-  };
-
-  const handleCenturyClick = (centuriesList: number[], century: number) => {
-    let newCenturies: number[];
-
-    if (century === 0) {
-      newCenturies = [];
-    } else if (centuriesList.includes(century)) {
-      newCenturies = centuriesList.filter(c => c !== century);
-    } else {
-      newCenturies = [...centuriesList, century];
-    }
-
-    setCenturies(newCenturies);
-    props.sendFilters({ name, sex, centuries: newCenturies });
-  };
+export const PeopleFilters = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const sex = searchParams.get('sex') ?? '';
+  const name = searchParams.get('query') ?? '';
+  const centuries = searchParams.getAll('centuries').map(Number);
+  const [activeSex, setActiveSex] = useState('none');
 
   const handleSexChange = (newSex: string) => {
-    setSex(newSex);
-    props.sendFilters({ name, sex: newSex, centuries });
+    const params = new URLSearchParams(searchParams);
+
+    if (newSex) {
+      params.set('sex', newSex);
+    } else {
+      params.delete('sex');
+    }
+
+    setSearchParams(params);
+    setActiveSex(newSex);
   };
 
-  const handleNameChange = (newName: string) => {
-    setName(newName);
-    props.sendFilters({ name: newName, sex, centuries });
+  const handleNameChange = (
+    newName: string,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams);
+
+    if (newName) {
+      params.set('query', newName);
+    } else {
+      params.delete('query');
+    }
+
+    setSearchParams(params);
+  };
+
+  const handleCenturyClick = (century: number) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (century === 0) {
+      params.delete('centuries');
+    } else if (centuries.includes(century)) {
+      params.delete('centuries');
+      centuries
+        .filter(c => c !== century)
+        .forEach(c => params.append('centuries', String(c)));
+    } else {
+      params.append('centuries', String(century));
+    }
+
+    setSearchParams(params);
+  };
+
+  const handleResetFilters = () => {
+    setSearchParams({});
   };
 
   return (
@@ -54,21 +67,21 @@ export const PeopleFilters = (props: PeopleFilterProps) => {
 
       <p className="panel-tabs" data-cy="SexFilter">
         <a
-          className="is-active"
+          className={classNames({ 'is-active': activeSex === 'none' })}
           href="#/people"
           onClick={() => handleSexChange('none')}
         >
           All
         </a>
         <a
-          className=""
+          className={classNames({ 'is-active': activeSex === 'm' })}
           href="#/people?sex=m"
           onClick={() => handleSexChange('m')}
         >
           Male
         </a>
         <a
-          className=""
+          className={classNames({ 'is-active': activeSex === 'f' })}
           href="#/people?sex=f"
           onClick={() => handleSexChange('f')}
         >
@@ -84,7 +97,7 @@ export const PeopleFilters = (props: PeopleFilterProps) => {
             className="input"
             placeholder="Search"
             value={name || ''}
-            onChange={e => handleNameChange(e.target.value)}
+            onChange={e => handleNameChange(e.target.value, e)}
           />
 
           <span className="icon is-left">
@@ -102,7 +115,10 @@ export const PeopleFilters = (props: PeopleFilterProps) => {
                 'is-info': centuries?.includes(16),
               })}
               href="#/people?centuries=16"
-              onClick={() => handleCenturyClick(centuries || [], 16)}
+              onClick={e => {
+                handleCenturyClick(16);
+                e.preventDefault();
+              }}
             >
               16
             </a>
@@ -113,7 +129,10 @@ export const PeopleFilters = (props: PeopleFilterProps) => {
                 'is-info': centuries?.includes(17),
               })}
               href="#/people?centuries=17"
-              onClick={() => handleCenturyClick(centuries || [], 17)}
+              onClick={e => {
+                handleCenturyClick(17);
+                e.preventDefault();
+              }}
             >
               17
             </a>
@@ -124,7 +143,10 @@ export const PeopleFilters = (props: PeopleFilterProps) => {
                 'is-info': centuries?.includes(18),
               })}
               href="#/people?centuries=18"
-              onClick={() => handleCenturyClick(centuries || [], 18)}
+              onClick={e => {
+                handleCenturyClick(18);
+                e.preventDefault();
+              }}
             >
               18
             </a>
@@ -135,7 +157,10 @@ export const PeopleFilters = (props: PeopleFilterProps) => {
                 'is-info': centuries?.includes(19),
               })}
               href="#/people?centuries=19"
-              onClick={() => handleCenturyClick(centuries || [], 19)}
+              onClick={e => {
+                handleCenturyClick(19);
+                e.preventDefault();
+              }}
             >
               19
             </a>
@@ -146,7 +171,10 @@ export const PeopleFilters = (props: PeopleFilterProps) => {
                 'is-info': centuries?.includes(20),
               })}
               href="#/people?centuries=20"
-              onClick={() => handleCenturyClick(centuries || [], 20)}
+              onClick={e => {
+                handleCenturyClick(20);
+                e.preventDefault();
+              }}
             >
               20
             </a>
@@ -157,7 +185,10 @@ export const PeopleFilters = (props: PeopleFilterProps) => {
               data-cy="centuryALL"
               className="button is-success is-outlined"
               href="#/people"
-              onClick={() => handleCenturyClick(centuries || [], 0)}
+              onClick={e => {
+                handleCenturyClick(0);
+                e.preventDefault();
+              }}
             >
               All
             </a>
