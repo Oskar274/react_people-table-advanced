@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react';
 import classNames from 'classnames';
+import { NavLink } from 'react-router-dom';
 
 export const Navbar = () => {
   const [active, setActive] = useState(false);
@@ -14,17 +15,27 @@ export const Navbar = () => {
     >
       <div className="container">
         <div className="navbar-brand">
-          <a className="navbar-item" href="#/">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              isActive
+                ? 'navbar-item has-background-grey-lighter'
+                : 'navbar-item'
+            }
+          >
             Home
-          </a>
+          </NavLink>
 
-          <a
-            aria-current="page"
-            className="navbar-item has-background-grey-lighter"
-            href="#/people"
+          <NavLink
+            to="#/people"
+            className={({ isActive }) =>
+              isActive
+                ? 'navbar-item has-background-grey-lighter'
+                : 'navbar-item'
+            }
           >
             People
-          </a>
+          </NavLink>
         </div>
       </div>
     </nav>

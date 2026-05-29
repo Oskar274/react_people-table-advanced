@@ -9,7 +9,6 @@ export const PeopleFilters = () => {
   const sex = searchParams.get('sex') ?? '';
   const name = searchParams.get('query') ?? '';
   const centuries = searchParams.getAll('centuries').map(Number);
-  const [activeSex, setActiveSex] = useState('none');
 
   const handleSexChange = (newSex: string) => {
     const params = new URLSearchParams(searchParams);
@@ -21,7 +20,6 @@ export const PeopleFilters = () => {
     }
 
     setSearchParams(params);
-    setActiveSex(newSex);
   };
 
   const handleNameChange = (
@@ -67,21 +65,21 @@ export const PeopleFilters = () => {
 
       <p className="panel-tabs" data-cy="SexFilter">
         <a
-          className={classNames({ 'is-active': activeSex === 'none' })}
+          className={classNames({ 'is-active': !sex })}
           href="#/people"
-          onClick={() => handleSexChange('none')}
+          onClick={() => handleSexChange('')}
         >
           All
         </a>
         <a
-          className={classNames({ 'is-active': activeSex === 'm' })}
+          className={classNames({ 'is-active': sex === 'm' })}
           href="#/people?sex=m"
           onClick={() => handleSexChange('m')}
         >
           Male
         </a>
         <a
-          className={classNames({ 'is-active': activeSex === 'f' })}
+          className={classNames({ 'is-active': sex === 'f' })}
           href="#/people?sex=f"
           onClick={() => handleSexChange('f')}
         >

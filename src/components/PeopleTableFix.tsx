@@ -43,8 +43,11 @@ export const PeopleTableFix = (props: Props) => {
     let result = peoplelist;
 
     if (query) {
-      result = result.filter(person =>
-        person.name.toLowerCase().includes(query.toLowerCase()),
+      result = result.filter(
+        person =>
+          person.name.toLowerCase().includes(query.toLowerCase()) ||
+          person.motherName?.toLowerCase().includes(query.toLowerCase()) ||
+          person.fatherName?.toLowerCase().includes(query.toLowerCase()),
       );
     }
 
