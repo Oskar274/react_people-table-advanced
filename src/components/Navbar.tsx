@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from 'react';
-import classNames from 'classnames';
+
 import { NavLink } from 'react-router-dom';
 
 export const Navbar = () => {
-  const [active, setActive] = useState(false);
-
   return (
     <nav
       data-cy="nav"
@@ -27,7 +24,7 @@ export const Navbar = () => {
           </NavLink>
 
           <NavLink
-            to="#/people"
+            to="people"
             className={({ isActive }) =>
               isActive
                 ? 'navbar-item has-background-grey-lighter'
