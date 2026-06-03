@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { NavLink } from 'react-router-dom';
+import { NavLink, useSearchParams } from 'react-router-dom';
 
 export const Navbar = () => {
+  const [searchParams] = useSearchParams();
+
   return (
     <nav
       data-cy="nav"
@@ -24,7 +26,7 @@ export const Navbar = () => {
           </NavLink>
 
           <NavLink
-            to="people"
+            to={`/people?${searchParams.toString()}`}
             className={({ isActive }) =>
               isActive
                 ? 'navbar-item has-background-grey-lighter'
