@@ -1,22 +1,18 @@
-import { useEffect, useState } from 'react';
-import { getPeople } from '../api';
 import { Person } from '../types';
-import { Loader } from './Loader';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 type Props = {
   name?: string;
   sex?: string;
   century?: number[];
+  people: Person[];
 };
 
-/* eslint-disable jsx-a11y/control-has-associated-label */
 export const PeopleTableFix = (props: Props) => {
-  const [people, setPeople] = useState<Person[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const sort = searchParams.get('sort') ?? '';
   const order = searchParams.get('order') ?? 'asc';
+  const { slug } = useParams();
 
   const getSortIcon = (field: string) => {
     if (sort !== field) {
@@ -25,12 +21,6 @@ export const PeopleTableFix = (props: Props) => {
 
     return order === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
   };
-
-  useEffect(() => {
-    getPeople()
-      .then(setPeople)
-      .finally(() => setLoading(false));
-  }, []);
 
   function renderPeople(
     peoplelist: Person[],
@@ -155,18 +145,20 @@ export const PeopleTableFix = (props: Props) => {
       </thead>
 
       <tbody>
-        {loading ? (
-          <Loader />
-        ) : (
+        {
           renderPeople(
-            people,
+            props.people,
             props.name ?? '',
             props.sex ?? '',
             props.century ?? [],
             sort,
             order,
           ).map(person => (
-            <tr data-cy="person" key={person.slug}>
+            <tr 
+              data-cy="person" 
+              key={person.slug} 
+              className={person.slug === slug ? 'has-background-warning' : ''}
+            > 
               <td>
                 <a
                   className={person.sex === 'f' ? 'has-text-danger' : ''}
@@ -203,7 +195,7 @@ export const PeopleTableFix = (props: Props) => {
               </td>
             </tr>
           ))
-        )}
+        }
       </tbody>
     </table>
   );
